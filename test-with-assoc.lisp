@@ -7,7 +7,21 @@
 (defparameter *al* '((:foo . "bar")
                      (:baz . "wizard")))
 
+(cdr (assoc :foo *al*))
+
+(with-assoc:with-assoc (foo)
+    *al*
+  foo)
+
+(with-assoc:with-assoc (:foo)
+    *al*
+  foo)
+
 (with-assoc:with-assoc (:foo :baz)
+    *al*
+  (list foo baz))
+
+(with-assoc:with-assoc (foo baz)
     *al*
   (list foo baz))
 
@@ -35,6 +49,10 @@
   (list foo baz))
 
 (with-assoc:with-assoc* (("FOO" :baz) :test 'equal)
+    *al2*
+  (list foo baz))
+
+(with-assoc:with-assoc* (("FOO" baz) :test 'equal)
     *al2*
   (list foo baz))
 
