@@ -10,9 +10,10 @@
 (defmacro with-assoc* ((associations &key key test) alist &body body)
   "Takes a list containing a list of keyspec pairs (where keyspec is
 either 1) an atom key where key is a string or a keyword, or 2) a list
-of the form (key var)) and (optional) keyword args key and test, an
-association list, and a body of code for which the variables will be
-bound to (cdr (assoc <key> alist))."
+of the form (key var &optional default-value)) and (optional) keyword
+args key and test, an association list, and a body of code for which
+the variables will be bound to (cdr (assoc <key> alist)) or
+default-value if (assoc <key> alist) returns nil."
   (let ((%alist (gensym "ALIST"))
         (pairvars (loop repeat (length associations)
                         collect (gensym "PAIR"))))
@@ -33,16 +34,19 @@ bound to (cdr (assoc <key> alist))."
                                      ,@(when test `(:test ,test)))))))
          (declare (ignorable ,@pairvars))
          (symbol-macrolet
-             (,@(loop for var in associations
+             (,@(loop for var-spec in associations
                       for pvar in pairvars
                    collect
                      (let ((var
-                            (if (and var (listp var))
-                                (cadr var)
-                                (intern (if (symbolp var)
-                                            (symbol-name var)
-                                            var)))))
-                       `(,var (cdr ,pvar)))))
+                            (if (and var-spec (listp var-spec))
+                                (cadr var-spec)
+                                (intern (if (symbolp var-spec)
+                                            (symbol-name var-spec)
+                                            var-spec)))))
+                       `(,var (if ,pvar
+                                  (cdr ,pvar)
+                                  ,(when (and var-spec (listp var-spec))
+                                     (caddr var-spec)))))))
            ,@body)))))
 
 (defmacro with-assoc (associations alist &body body)
