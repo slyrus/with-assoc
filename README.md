@@ -1,17 +1,17 @@
 
 # Table of Contents
 
-1.  [with-assoc](#orge70b112)
-    1.  [Overview](#org5022895)
-    2.  [common-lisp:assoc](#orgfb93cbc)
-    3.  [with-assoc](#org52720f4)
-    4.  [with-assoc-equal](#org9952d66)
-    5.  [with-assoc\*](#org9e8bc27)
-    6.  [Default values](#org5fe14fa)
+1.  [with-assoc](#orgfae7a7e)
+    1.  [Overview](#org6650081)
+    2.  [common-lisp:assoc](#orgfe4bbb2)
+    3.  [with-assoc](#org88043bc)
+    4.  [with-assoc-equal](#org763550a)
+    5.  [with-assoc\*](#org6752e8e)
+    6.  [Default values](#org2e09baf)
 
 
 
-<a id="orge70b112"></a>
+<a id="orgfae7a7e"></a>
 
 # with-assoc
 
@@ -19,7 +19,7 @@ A library for working with association lists providing macros that
 hide the use of cl:assoc.
 
 
-<a id="org5022895"></a>
+<a id="org6650081"></a>
 
 ## Overview
 
@@ -45,6 +45,8 @@ With the with-assoc library we can do the following:
         *al*
       foo)
 
+    bar
+
 Obviously this doesn't save us much typing (quite the opposite in
 fact), but if we're using lots of pairs in association lists and
 particularly if we're reusing the same values multiple value times, it
@@ -54,7 +56,7 @@ can be convenient to have some short-hand syntax for
       ...)
 
 
-<a id="orgfb93cbc"></a>
+<a id="orgfe4bbb2"></a>
 
 ## common-lisp:assoc
 
@@ -67,7 +69,7 @@ the pair itself is tested, otherwise the results of calling (key (car
 or is via #'eql if no test function is supplied.
 
 
-<a id="org52720f4"></a>
+<a id="org88043bc"></a>
 
 ## with-assoc
 
@@ -78,8 +80,10 @@ in the associative list with #'eql.
         *al*
       foo)
 
+    bar
 
-<a id="org9952d66"></a>
+
+<a id="org763550a"></a>
 
 ## with-assoc-equal
 
@@ -94,8 +98,10 @@ strings, rather than keywords.
         *al2*
       (list foo baz))
 
+    (NIL "wizard")
 
-<a id="org9e8bc27"></a>
+
+<a id="org6752e8e"></a>
 
 ## with-assoc\*
 
@@ -107,8 +113,10 @@ argument).
         *al2*
       (list foo baz))
 
+    ("bar" "wizard")
 
-<a id="org5fe14fa"></a>
+
+<a id="org2e09baf"></a>
 
 ## Default values
 
@@ -119,4 +127,16 @@ in the event that none is provided in the alist. Take for example:
         '((:foo . "bar")
           (:baz . "wizard"))
       (list foo baz blort))
+
+    ("bar" "wizard" "splat")
+
+On the other hand, if we have a default value, but also a corresponding vlaue in the alist, that is used instead:
+
+    (with-assoc:with-assoc (:foo :baz (:blort blort "splat"))
+        '((:foo . "bar")
+          (:baz . "wizard")
+          (:blort . "bananas!"))
+      (list foo baz blort))
+
+    ("bar" "wizard" "bananas!")
 

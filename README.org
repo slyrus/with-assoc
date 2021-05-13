@@ -11,7 +11,7 @@ hide the use of cl:assoc.
 ** Overview
 When working with assoc functions, one ends up calling something like:
 
-#+begin_src lisp :evasl no
+#+begin_src lisp :eval no
   (cdr (assoc foo :bar))
 #+end_src
 
@@ -38,7 +38,7 @@ The standrad way to get access to the element whose car is :foo would be:
 
 With the with-assoc library we can do the following:
 
-#+begin_src lisp :session
+#+begin_src lisp :session :exports both :results value verbatim
   (with-assoc:with-assoc (foo)
       *al*
     foo)
@@ -71,7 +71,7 @@ or is via #'eql if no test function is supplied.
 with-assoc is meant to be used when item is tested against the items
 in the associative list with #'eql.
 
-#+begin_src lisp :session
+#+begin_src lisp :session :exports both :results value verbatim
   (with-assoc:with-assoc (foo)
       *al*
     foo)
@@ -85,7 +85,7 @@ with-assoc is meant to be used when item is tested against the items
 in the associative list with #'equal, such as when the items are
 strings, rather than keywords.
 
-#+begin_src lisp :session
+#+begin_src lisp :sessino :exports both :results value verbatim
   (defparameter *al2* '(("FOO" . "bar")
                         (:baz . "wizard")))
 
@@ -102,7 +102,7 @@ with-assoc* take keyword arguments key and test which provide the full
 flexibility of the assoc (except for the deprecated :test-not
 argument).
 
-#+begin_src lisp :session
+#+begin_src lisp :session :exports both :results value verbatim
   (with-assoc:with-assoc* ((("FOO" foo) :baz) :test 'equal)
       *al2*
     (list foo baz))
@@ -115,7 +115,7 @@ argument).
 The various flavors of with-assoc can take an optional default value
 in the event that none is provided in the alist. Take for example:
 
-#+begin_src lisp :session
+#+begin_src lisp :session :exports both :results value verbatim
   (with-assoc:with-assoc (:foo :baz (:blort blort "splat"))
       '((:foo . "bar")
         (:baz . "wizard"))
@@ -125,3 +125,12 @@ in the event that none is provided in the alist. Take for example:
 #+RESULTS:
 | bar | wizard | splat |
 
+On the other hand, if we have a default value, but also a corresponding vlaue in the alist, that is used instead:
+
+#+begin_src lisp :session :exports both :results value verbatim
+  (with-assoc:with-assoc (:foo :baz (:blort blort "splat"))
+      '((:foo . "bar")
+        (:baz . "wizard")
+        (:blort . "bananas!"))
+    (list foo baz blort))
+#+end_src
