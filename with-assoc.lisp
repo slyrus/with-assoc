@@ -16,7 +16,7 @@ the variables will be bound to (cdr (assoc <key> alist)) or
 default-value if (assoc <key> alist) returns nil."
   (let ((%alist (gensym "ALIST"))
         (pairvars (loop repeat (length associations)
-                        collect (gensym "PAIR"))))
+                     collect (gensym "PAIR"))))
     `(let ((,%alist ,alist))
        (let (,@(loop for value in associations
                   for pvar in pairvars
@@ -35,7 +35,7 @@ default-value if (assoc <key> alist) returns nil."
          (declare (ignorable ,@pairvars))
          (symbol-macrolet
              (,@(loop for var-spec in associations
-                      for pvar in pairvars
+                   for pvar in pairvars
                    collect
                      (let ((var
                             (if (and var-spec (listp var-spec))
@@ -43,10 +43,17 @@ default-value if (assoc <key> alist) returns nil."
                                 (intern (if (symbolp var-spec)
                                             (symbol-name var-spec)
                                             var-spec)))))
-                       `(,var (if ,pvar
-                                  (cdr ,pvar)
-                                  ,(when (and var-spec (listp var-spec))
-                                     (caddr var-spec)))))))
+                       (if (listp var-spec)
+                           (destructuring-bind (var-key var-var &optional
+                                                        (var-default nil var-default-supplied-p))
+                               var-spec
+                             (declare (ignore var-key var-var))
+                             `(,var ,(if var-default-supplied-p
+                                         `(if ,pvar
+                                              (cdr ,pvar)
+                                              ,var-default)
+                                         `(cdr ,pvar))))
+                           `(,var (cdr ,pvar))))))
            ,@body)))))
 
 (defmacro with-assoc (associations alist &body body)
